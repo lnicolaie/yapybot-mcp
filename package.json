@@ -1,0 +1,36 @@
+{
+  "name": "@yapybot/mcp",
+  "version": "0.1.0",
+  "description": "Yapy MCP Server for Claude Desktop and Cursor",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "yapy-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lnicolaie/yapybot-mcp.git"
+  },
+  "author": "Yapy Team",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc -w",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.27.1",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.3.3"
+  }
+}
