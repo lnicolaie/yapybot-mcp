@@ -1,6 +1,6 @@
 {
   "name": "@yapybot/mcp",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Yapy MCP Server for Claude Desktop and Cursor",
   "type": "module",
   "main": "dist/index.js",
