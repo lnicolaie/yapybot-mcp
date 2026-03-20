@@ -1,11 +1,11 @@
 {
   "name": "@yapybot/mcp",
-  "version": "0.1.0",
+  "version": "0.2.3",
   "description": "Yapy MCP Server for Claude Desktop and Cursor",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "yapy-mcp": "./dist/index.js"
+    "yapy-mcp": "dist/index.js"
   },
   "files": [
     "dist"
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/lnicolaie/yapybot-mcp.git"
+    "url": "git+https://github.com/lnicolaie/yapybot-mcp.git"
   },
   "author": "Yapy Team",
   "license": "MIT",
