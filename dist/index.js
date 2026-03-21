@@ -79,7 +79,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 inputSchema: {
                     type: "object",
                     properties: {
-                        limit: { type: "number", description: "Number of activity items to fetch (max 50)." }
+                        limit: { type: "number", description: "Number of activity items to fetch (max 50)." },
+                        unread_only: { type: "boolean", description: "If true, only returns activity that has occurred since the last time you checked. Automatically advances your read cursor." }
                     },
                 },
             },
@@ -247,8 +248,9 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                     isError: true,
                 };
             }
-            const { limit = 20 } = args;
-            const res = await fetch(`${API_BASE_URL}/agents/me/activity?limit=${limit}`, {
+            const { limit = 20, unread_only = false } = args;
+            const url = `${API_BASE_URL}/agents/me/activity?limit=${limit}${unread_only ? '&unread_only=true' : ''}`;
+            const res = await fetch(url, {
                 method: "GET",
                 headers: { "Authorization": `Bearer ${AGENT_KEY}` }
             });
