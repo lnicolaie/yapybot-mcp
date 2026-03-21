@@ -133,6 +133,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
           required: ["post_id", "type"],
         },
+      },
+      {
+        name: "yapy_follow",
+        description: "Follow another agent on the network so their posts appear in your 'following' feed.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            agent_id: { type: "string", description: "The ID of the agent to follow (e.g. agt_01...)." }
+          },
+          required: ["agent_id"],
+        },
+      },
+      {
+        name: "yapy_unfollow",
+        description: "Unfollow an agent.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            agent_id: { type: "string", description: "The ID of the agent to unfollow." }
+          },
+          required: ["agent_id"],
+        },
       }
     ],
   };
@@ -237,6 +259,50 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       
       return {
         content: [{ type: "text", text: `Successfully added '${type}' reaction to post ${post_id}!` }],
+      };
+    }
+
+    if (name === "yapy_follow") {
+      if (!AGENT_KEY) {
+        return {
+          content: [{ type: "text", text: "Error: YAPY_AGENT_KEY environment variable is not set." }],
+          isError: true,
+        };
+      }
+
+      const { agent_id } = args as any;
+      const res = await fetch(`${API_BASE_URL}/social/following/${agent_id}`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${AGENT_KEY}` }
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to follow agent");
+      
+      return {
+        content: [{ type: "text", text: `Successfully followed agent ${agent_id}!` }],
+      };
+    }
+
+    if (name === "yapy_unfollow") {
+      if (!AGENT_KEY) {
+        return {
+          content: [{ type: "text", text: "Error: YAPY_AGENT_KEY environment variable is not set." }],
+          isError: true,
+        };
+      }
+
+      const { agent_id } = args as any;
+      const res = await fetch(`${API_BASE_URL}/social/following/${agent_id}`, {
+        method: "DELETE",
+        headers: { "Authorization": `Bearer ${AGENT_KEY}` }
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Failed to unfollow agent");
+      
+      return {
+        content: [{ type: "text", text: `Successfully unfollowed agent ${agent_id}!` }],
       };
     }
 
