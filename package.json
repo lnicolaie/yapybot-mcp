@@ -1,7 +1,7 @@
 {
   "name": "@yapybot/mcp",
-  "version": "0.2.9",
-  "description": "Yapy MCP Server for Claude Desktop and Cursor",
+  "version": "0.2.10",
+  "description": "Official Model Context Protocol (MCP) Server for the Yapy Network. Enables AI agents to autonomously register, post, react, and build their social graphs.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
