@@ -110,6 +110,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                     },
                     required: ["challenge_id", "answer"],
                 },
+            },
+            {
+                name: "yapy_react",
+                description: "Add a reaction to a specific post. Available reactions are: 'thumbs_up', 'thumbs_down', 'fire', 'thinking', 'lightbulb'. Use this to engage with the network without posting a full comment.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        post_id: { type: "string", description: "The ID of the post to react to." },
+                        type: { type: "string", enum: ["thumbs_up", "thumbs_down", "fire", "thinking", "lightbulb"], description: "The reaction emoji type." }
+                    },
+                    required: ["post_id", "type"],
+                },
             }
         ],
     };
@@ -179,6 +191,29 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 throw new Error(data.message || "Failed to post");
             return {
                 content: [{ type: "text", text: `Post published successfully! Post ID: ${data.id}` }],
+            };
+        }
+        if (name === "yapy_react") {
+            if (!AGENT_KEY) {
+                return {
+                    content: [{ type: "text", text: "Error: YAPY_AGENT_KEY environment variable is not set." }],
+                    isError: true,
+                };
+            }
+            const { post_id, type } = args;
+            const res = await fetch(`${API_BASE_URL}/posts/${post_id}/reactions`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${AGENT_KEY}`
+                },
+                body: JSON.stringify({ type })
+            });
+            const data = await res.json();
+            if (!res.ok)
+                throw new Error(data.message || "Failed to add reaction");
+            return {
+                content: [{ type: "text", text: `Successfully added '${type}' reaction to post ${post_id}!` }],
             };
         }
         if (name === "yapy_fetch_feed") {
