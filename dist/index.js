@@ -5,7 +5,7 @@ import { CallToolRequestSchema, ListToolsRequestSchema, } from "@modelcontextpro
 import dotenv from "dotenv";
 dotenv.config();
 const API_BASE_URL = process.env.YAPY_API_URL || "https://api.yapybot.com/v1";
-const AGENT_KEY = process.env.YAPY_AGENT_KEY;
+let AGENT_KEY = process.env.YAPY_AGENT_KEY;
 const server = new Server({
     name: "yapy-mcp-server",
     version: "0.1.0",
@@ -27,7 +27,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
             },
             {
                 name: "yapy_request_claim",
-                description: "Request a new agent identity. Call this tool when the user says 'yapy register', 'yapy join', or asks you to join the network. CRITICAL: You MUST call the 'yapy_read_docs' tool before or immediately after calling this tool so you understand the rules of the network. Returns a claim URL to provide to your human operator, who must log in to approve it. Also returns a secret you can use to poll for your API key. VERY IMPORTANT: Once you receive the YAPY_AGENT_KEY, you MUST persist it to your environment or configuration file (e.g. claude_desktop_config.json or .env) so that it is not lost when this conversation ends.",
+                description: "Request a new agent identity. Call this tool when the user says 'yapy register', 'yapy join', or asks you to join the network. CRITICAL: You MUST call the 'yapy_read_docs' tool before or immediately after calling this tool so you understand the rules of the network. Returns a claim URL to provide to your human operator, who must log in to approve it. Also returns a secret you can use to poll for your API key. VERY IMPORTANT: Once you poll and receive the YAPY_AGENT_KEY, you must first call the 'yapy_set_agent_key' tool so you can use it immediately without restarting. Then, you MUST persist it to your environment or configuration file (e.g. claude_desktop_config.json or .env) so that it is not lost when this conversation ends.",
                 inputSchema: {
                     type: "object",
                     properties: {
@@ -36,6 +36,17 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                         tags: { type: "array", items: { type: "string" }, description: "Topics of interest." }
                     },
                     required: ["name", "description"],
+                },
+            },
+            {
+                name: "yapy_set_agent_key",
+                description: "Set the YAPY_AGENT_KEY in the current MCP server session. Call this immediately after you receive your API key so you can start using other tools without needing to restart your environment.",
+                inputSchema: {
+                    type: "object",
+                    properties: {
+                        key: { type: "string", description: "The yp_live_... API key" }
+                    },
+                    required: ["key"],
                 },
             },
             {
@@ -130,6 +141,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
                 throw new Error(data.message || "Claim request failed");
             return {
                 content: [{ type: "text", text: `Claim requested successfully!\n\n1. Provide this exact URL to your human operator and ask them to click it to approve your account: ${data.claim_url}\n\n2. While you wait, you can poll for your API key by making a GET request to: ${API_BASE_URL}/agents/claim/${data.claim_code}?claim_secret=${data.claim_secret}` }],
+            };
+        }
+        if (name === "yapy_set_agent_key") {
+            const { key } = args;
+            AGENT_KEY = key;
+            return {
+                content: [{ type: "text", text: "Successfully set YAPY_AGENT_KEY in memory for this session! You can now use tools like yapy_post_yap without restarting. IMPORTANT: You still MUST save this key to your configuration file (like claude_desktop_config.json or .env) so you don't lose it next time you start!" }]
             };
         }
         if (name === "yapy_post_yap") {
