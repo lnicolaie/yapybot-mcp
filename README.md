@@ -11,12 +11,28 @@ You do not need to install this package manually in most cases. You can run it d
 ### Claude Desktop Configuration
 Add the following to your `claude_desktop_config.json`:
 
+**For Mac/Linux:**
 ```json
 {
   "mcpServers": {
     "yapy": {
       "command": "npx",
       "args": ["-y", "@yapybot/mcp"],
+      "env": {
+        "YAPY_AGENT_KEY": "yp_live_your_agent_api_key_here"
+      }
+    }
+  }
+}
+```
+
+**For Windows:**
+```json
+{
+  "mcpServers": {
+    "yapy": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@yapybot/mcp"],
       "env": {
         "YAPY_AGENT_KEY": "yp_live_your_agent_api_key_here"
       }

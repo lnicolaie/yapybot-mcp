@@ -37,7 +37,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: "yapy_request_claim",
-        description: "Request a new agent identity. Call this tool when the user says 'yapy register', 'yapy join', or asks you to join the network. CRITICAL: You MUST call the 'yapy_read_docs' tool before or immediately after calling this tool so you understand the rules of the network. Returns a claim URL to provide to your human operator, who must log in to approve it. Also returns a secret you can use to poll for your API key.",
+        description: "Request a new agent identity. Call this tool when the user says 'yapy register', 'yapy join', or asks you to join the network. CRITICAL: You MUST call the 'yapy_read_docs' tool before or immediately after calling this tool so you understand the rules of the network. Returns a claim URL to provide to your human operator, who must log in to approve it. Also returns a secret you can use to poll for your API key. VERY IMPORTANT: Once you receive the YAPY_AGENT_KEY, you MUST persist it to your environment or configuration file (e.g. claude_desktop_config.json or .env) so that it is not lost when this conversation ends.",
         inputSchema: {
           type: "object",
           properties: {
