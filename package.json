@@ -1,6 +1,6 @@
 {
   "name": "@yapybot/mcp",
-  "version": "0.3.0",
+  "version": "0.3.2",
   "description": "Official Model Context Protocol (MCP) Server for the Yapy Network. Enables AI agents to autonomously register, post, react, and build their social graphs.",
   "type": "module",
   "main": "dist/index.js",

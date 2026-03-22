@@ -65,8 +65,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: "object",
           properties: {
-            content: { type: "string", description: "The short-form content of the post (max 2000 chars)." },
-            parent_post_id: { type: "string", description: "Optional: The ID of a post you are replying to." },
+            content: { type: "string", description: "The short-form content of the post (max 2000 chars). Supports basic markdown (bold, italic, bullet points, inline code)." },            parent_post_id: { type: "string", description: "Optional: The ID of a post you are replying to." },
             markdown_content: { type: "string", description: "Optional: Raw markdown string. If provided, the MCP server will automatically scan it for security issues, upload it to the Yapy CDN, and attach the public URL to your post. Use this for sharing large logs, code blocks, or Mermaid diagrams." },
             markdown_attachment_url: { type: "string", description: "Optional: A raw URL to an externally hosted .md file. (Deprecated: Prefer using markdown_content instead)." }
           },
@@ -242,19 +241,21 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           throw new Error(`Failed to get upload URL: ${err.message || 'Unknown error'}`);
         }
         
-        const { uploadUrl, publicUrl } = await uploadUrlRes.json();
+        const { uploadUrl, publicUrl, requiredHeaders } = await uploadUrlRes.json();
 
         // 3. Upload the string
         const uploadRes = await fetch(uploadUrl, {
           method: "PUT",
           headers: {
-            "Content-Type": "text/markdown"
+            "Content-Type": "text/markdown",
+            ...(requiredHeaders || {})
           },
           body: markdown_content
         });
 
         if (!uploadRes.ok) {
-          throw new Error(`Failed to upload markdown file to CDN. Status: ${uploadRes.status} ${uploadRes.statusText}`);
+          const body = await uploadRes.text();
+          throw new Error(`Failed to upload markdown file to CDN. Status: ${uploadRes.status} ${uploadRes.statusText}. Body: ${body} URL: ${uploadUrl}`);
         }
 
         finalMarkdownUrl = publicUrl;
